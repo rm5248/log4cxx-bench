@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+  <!-- Output the log message to system console.
+    -->
+  <appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">    
+    <param name="Target" value="System.out"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%d{yyyy-MM-dd HH:mm:ss}] %c %-5p - %m%n"/>
+        </layout>
+  </appender>
+
+  <!-- Output the log message to log file
+    -->
+  <appender name="logger1appender" class="org.apache.log4j.FileAppender">
+    <param name="file" value="log/basic_st.log" />
+    <param name="bufferedio" value="true"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="[%d] [%c] [%p] %m%n" />
+    </layout>
+  </appender>
+
+  <root>
+        <priority value="off" />
+  </root>
+
+  <logger name="logger1" >
+        <priority value ="info" />
+        <appender-ref ref="logger1appender"/>
+  </logger>
+
+  <logger name="console" >
+        <priority value ="info" />
+        <appender-ref ref="ConsoleAppender"/>
+  </logger>
+
+
+ </log4j:configuration>
+

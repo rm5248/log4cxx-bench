@@ -1,0 +1,53 @@
+Log4cxx output:
+
+[2020-12-25 21:15:40] console INFO  - **************************************************************
+[2020-12-25 21:15:40] console INFO  - Single threaded: 250000 messages
+[2020-12-25 21:15:40] console INFO  - **************************************************************
+[2020-12-25 21:15:40] console INFO  - logger1 Elapsed: 0.345095 secs 724438/sec
+[2020-12-25 21:15:40] console INFO  - logger1 Elapsed: 0.428021 secs 584083/sec
+
+spdlog output:
+
+[info] **************************************************************
+[info] Single threaded: 250000 messages
+[info] **************************************************************
+[info] basic_st                       Elapsed: 0.13 secs        1,938,869/sec
+[info] basic_st/backtrace-on          Elapsed: 0.07 secs        3,763,090/sec
+[info] 
+[info] rotating_st                    Elapsed: 0.06 secs        4,373,779/sec
+[info] rotating_st/backtrace-on       Elapsed: 0.07 secs        3,694,462/sec
+[info] 
+[info] daily_st                       Elapsed: 0.05 secs        4,705,836/sec
+[info] daily_st/backtrace-on          Elapsed: 0.07 secs        3,529,215/sec
+[info] 
+[info] level-off                      Elapsed: 0.00 secs      115,206,470/sec
+[info] level-off/backtrace-on         Elapsed: 0.04 secs        6,642,462/sec
+[info] **************************************************************
+[info] Multi threaded: 1 threads, 250,000 messages
+[info] **************************************************************
+[info] basic_mt                       Elapsed: 0.13 secs        1,941,461/sec
+[info] basic_mt/backtrace-on          Elapsed: 0.08 secs        2,999,133/sec
+[info] 
+[info] rotating_mt                    Elapsed: 0.06 secs        3,905,131/sec
+[info] rotating_mt/backtrace-on       Elapsed: 0.09 secs        2,810,200/sec
+[info] 
+[info] daily_mt                       Elapsed: 0.06 secs        4,333,493/sec
+[info] daily_mt/backtrace-on          Elapsed: 0.09 secs        2,876,895/sec
+[info] 
+[info] level-off                      Elapsed: 0.00 secs      120,886,007/sec
+[info] level-off/backtrace-on         Elapsed: 0.04 secs        6,703,686/sec
+[info] **************************************************************
+[info] Multi threaded: 4 threads, 250,000 messages
+[info] **************************************************************
+[info] basic_mt                       Elapsed: 0.07 secs        3,522,658/sec
+[info] basic_mt/backtrace-on          Elapsed: 0.09 secs        2,916,820/sec
+[info] 
+[info] rotating_mt                    Elapsed: 0.08 secs        3,155,177/sec
+[info] rotating_mt/backtrace-on       Elapsed: 0.10 secs        2,607,757/sec
+[info] 
+[info] daily_mt                       Elapsed: 0.08 secs        3,214,696/sec
+[info] daily_mt/backtrace-on          Elapsed: 0.09 secs        2,748,373/sec
+[info] 
+[info] level-off                      Elapsed: 0.00 secs      121,992,816/sec
+[info] level-off/backtrace-on         Elapsed: 0.04 secs        6,678,844/sec
+

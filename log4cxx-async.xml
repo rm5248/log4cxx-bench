@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+<appender name="Async" class="org.apache.log4j.AsyncAppender">
+  <param name="Blocking" value="true" />
+  <appender-ref ref="main_appender" />
+</appender>
+  <!-- Output the log message to log file -->
+  <appender name="main_appender" class="org.apache.log4j.FileAppender">
+    <param name="file" value="logging_server_logs.log" />
+    <param name="append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern"
+      value="%m%n" />
+    </layout>
+  </appender>
+  
+  
+  <logger name="messages" additivity="false">
+    <level value ="debug" /> <!-- Log values with level higher than ... -->
+    <appender-ref ref="Async"/>
+  </logger>
+</log4j:configuration>
