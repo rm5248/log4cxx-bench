@@ -7,6 +7,14 @@
 #include <memory>
 #include <string>
 #include <thread>
+#include <unistd.h>
+#include <fcntl.h>
+#include <iostream>
+#include <fstream>
+
+#include <fmt/core.h>
+#include <fmt/chrono.h>
+#include <fmt/ostream.h>
 
 void bench(int howmany, log4cxx::LoggerPtr log);
 //void bench_mt(int howmany, std::shared_ptr<spdlog::logger> log, size_t thread_count);
@@ -18,9 +26,18 @@ static const size_t file_size = 30 * 1024 * 1024;
 static const size_t rotating_files = 5;
 static const int max_threads = 1000;
 
+struct mystruct {
+
+};
+
 static log4cxx::LoggerPtr logger1 = log4cxx::Logger::getLogger( "logger1" );
 static log4cxx::LoggerPtr console = log4cxx::Logger::getLogger( "console" );
 static log4cxx::LoggerPtr messages_async = log4cxx::Logger::getLogger( "messages" );
+
+static std::ostream& operator<<( std::ostream& os, const mystruct s ){
+	os << "mystruct";
+	return os;
+}
 
 static void loadLogConfigFile( std::string fileName ){
 	console->removeAllAppenders();
@@ -75,8 +92,8 @@ void bench_single_threaded(int iters)
     bench(iters, logger1);
 
 	// Load file with rotating
-	loadLogConfigFile( "log4cxx-rotating.xml" );
-	bench(iters, logger1);
+//	loadLogConfigFile( "log4cxx-rotating.xml" );
+//	bench(iters, logger1);
 
 /*
     auto basic_st_tracing = spdlog::basic_logger_st("basic_st/backtrace-on", "logs/basic_st.log", true);
@@ -124,6 +141,148 @@ static void blah(){
 	exit( 0 );
 }
 
+static void bench_fputs(int howmany){
+	using std::chrono::duration;
+	using std::chrono::duration_cast;
+	using std::chrono::high_resolution_clock;
+
+	FILE* f = fopen( "log/fputs", "w+" );
+	auto start = high_resolution_clock::now();
+	for (auto i = 0; i < howmany; ++i)
+	{
+		std::string msg =  "Hello logger: msg number ";
+		msg.append( std::to_string( i ) );
+		msg.append( "\n" );
+		fputs( msg.c_str(), f );
+	}
+	fclose(f);
+
+	auto delta = high_resolution_clock::now() - start;
+	auto delta_d = duration_cast<duration<double>>(delta).count();
+
+	LOG4CXX_INFO( console, "fputs: Elapsed: " << delta_d << " secs " << int(howmany / delta_d) << "/sec" );
+}
+
+static void bench_fputs_libfmt(int howmany){
+	using std::chrono::duration;
+	using std::chrono::duration_cast;
+	using std::chrono::high_resolution_clock;
+
+	FILE* f = fopen( "log/fputs", "w+" );
+	auto start = high_resolution_clock::now();
+	for (auto i = 0; i < howmany; ++i)
+	{
+//		std::string msg = fmt::format("Hello logger: msg number {}", i);
+		std::time_t now = std::time(nullptr);
+		std::string msg = fmt::format( "date: {}\n",
+//					fmt::arg("localdate",fmt::localtime(now)),
+//					fmt::arg("gmtdate", fmt::gmtime(now)),
+					fmt::arg("logger", "foo.bar.baz"),
+					fmt::arg("class", "ClassName"),
+					fmt::arg("filename","foo.cpp"),
+					fmt::arg("line", 67),
+					fmt::arg("message", "this is the message for the logger"),
+					fmt::arg("method", "example_method"),
+					fmt::arg("newline", "\n"),
+					fmt::arg("level", "INFO"),
+					fmt::arg("runtime", 892342),
+					fmt::arg("thread", "threadname"),
+					fmt::arg("ndc", "" ),
+					fmt::arg("mdc", "") );
+		fputs( msg.c_str(), f );
+	}
+	fclose(f);
+
+	auto delta = high_resolution_clock::now() - start;
+	auto delta_d = duration_cast<duration<double>>(delta).count();
+
+	LOG4CXX_INFO( console, "fputs_libfmt: Elapsed: " << delta_d << " secs " << int(howmany / delta_d) << "/sec" );
+}
+
+static void bench_write(int howmany){
+	using std::chrono::duration;
+	using std::chrono::duration_cast;
+	using std::chrono::high_resolution_clock;
+
+	int fd = open( "log/write", O_RDWR | O_CREAT | O_NONBLOCK, S_IFREG | S_IRUSR | S_IWUSR );
+	auto start = high_resolution_clock::now();
+	for (auto i = 0; i < howmany; ++i)
+	{
+		std::string msg =  "Hello logger: msg number ";
+		msg.append( std::to_string( i ) );
+		msg.append( "\n" );
+		write( fd, msg.c_str(), msg.length() );
+	}
+	close(fd);
+
+	auto delta = high_resolution_clock::now() - start;
+	auto delta_d = duration_cast<duration<double>>(delta).count();
+
+	LOG4CXX_INFO( console, "write: Elapsed: " << delta_d << " secs " << int(howmany / delta_d) << "/sec" );
+}
+
+static void bench_fstream(int howmany){
+	using std::chrono::duration;
+	using std::chrono::duration_cast;
+	using std::chrono::high_resolution_clock;
+
+	std::fstream f( "log/fstream" );
+	auto start = high_resolution_clock::now();
+	for (auto i = 0; i < howmany; ++i)
+	{
+		std::string msg =  "Hello logger: msg number ";
+		msg.append( std::to_string( i ) );
+		msg.append( "\n" );
+		f << msg;
+	}
+	f.close();
+
+	auto delta = high_resolution_clock::now() - start;
+	auto delta_d = duration_cast<duration<double>>(delta).count();
+
+	LOG4CXX_INFO( console, "fstream: Elapsed: " << delta_d << " secs " << int(howmany / delta_d) << "/sec" );
+}
+
+static void bench_fwrite(int howmany){
+	using std::chrono::duration;
+	using std::chrono::duration_cast;
+	using std::chrono::high_resolution_clock;
+
+	FILE* f = fopen( "log/fputs", "w+" );
+	auto start = high_resolution_clock::now();
+	for (auto i = 0; i < howmany; ++i)
+	{
+		std::string msg =  "Hello logger: msg number ";
+		msg.append( std::to_string( i ) );
+		msg.append( "\n" );
+		fwrite( msg.c_str(), 1, msg.length(), f );
+	}
+	fclose(f);
+
+	auto delta = high_resolution_clock::now() - start;
+	auto delta_d = duration_cast<duration<double>>(delta).count();
+
+	LOG4CXX_INFO( console, "fwrite: Elapsed: " << delta_d << " secs " << int(howmany / delta_d) << "/sec" );
+}
+
+void bench_libfmt(int howmany, log4cxx::LoggerPtr log)
+{
+	using std::chrono::duration;
+	using std::chrono::duration_cast;
+	using std::chrono::high_resolution_clock;
+
+	auto start = high_resolution_clock::now();
+	for (auto i = 0; i < howmany; ++i)
+	{
+		LOG4CXX_INFO( log, fmt::format("Hello logger: msg number {}", i));
+	}
+
+	auto delta = high_resolution_clock::now() - start;
+	auto delta_d = duration_cast<duration<double>>(delta).count();
+
+	LOG4CXX_INFO( console, "(libfmt)" << log->getName() << " Elapsed: " << delta_d << " secs " << int(howmany / delta_d) << "/sec" );
+}
+
 int main(int argc, char *argv[])
 {
 //	blah();
@@ -131,6 +290,8 @@ int main(int argc, char *argv[])
     //spdlog::default_logger()->set_pattern("[%^%l%$] %v");
     int iters = 250000;
 	size_t threads = 4;
+
+	//iters=50000;
     try
     {
 
@@ -149,8 +310,15 @@ int main(int argc, char *argv[])
         }
 
         bench_single_threaded(iters);
+		bench_fputs(iters);
+		bench_write(iters);
+		bench_fstream(iters);
+		bench_fwrite(iters);
+		bench_fputs_libfmt(iters);
+		bench_libfmt(iters, logger1);
         //bench_threaded_logging(1, iters);
         //bench_threaded_logging(threads, iters);
+
     }
     catch (std::exception &ex)
     {

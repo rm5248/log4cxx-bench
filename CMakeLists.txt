@@ -21,12 +21,17 @@ find_package(Threads REQUIRED)
 #    endif()
 #endif()
 
+find_package(fmt)
+
 find_package(log4cxx 0.11)
 add_executable(bench bench.cpp)
 target_include_directories(bench PRIVATE $<TARGET_PROPERTY:log4cxx,INTERFACE_INCLUDE_DIRECTORIES>)
-target_link_libraries( bench PRIVATE log4cxx)
+target_link_libraries( bench PRIVATE fmt::fmt log4cxx )
 #target_compile_options(bench PRIVATE -fsanitize=leak -fsanitize=address)
 #target_link_options(bench PRIVATE -fsanitize=leak -fsanitize=address)
+
+#target_compile_options(bench PRIVATE -fsanitize=thread)
+#target_link_options(bench PRIVATE -fsanitize=thread)
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/log4cxx.xml
                 ${CMAKE_CURRENT_BINARY_DIR}/log4cxx.xml
