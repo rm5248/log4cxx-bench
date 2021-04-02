@@ -222,6 +222,9 @@ int main(int argc, char *argv[])
 	size_t threads = 4;
 	size_t max_threads = 32;
 
+	std::setlocale( LC_ALL, "" ); /* Set locale for C functions */
+	std::locale::global(std::locale("")); /* set locale for C++ functions */
+
 	console->setAdditivity( false );
 	log4cxx::PatternLayoutPtr pattern( new log4cxx::PatternLayout() );
 	pattern->setConversionPattern( "%m%n" );
