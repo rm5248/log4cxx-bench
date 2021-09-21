@@ -13,6 +13,7 @@
 #include "log4cxxbenchmarker.h"
 
 static log4cxx::LoggerPtr console = log4cxx::Logger::getLogger( "console" );
+static std::vector<uint64_t> results;
 
 static void benchmark_function( std::string name, void (*fn)(int), int howmany ){
 	using std::chrono::duration;
@@ -28,6 +29,8 @@ static void benchmark_function( std::string name, void (*fn)(int), int howmany )
 					  name,
 					  delta_d,
 					  int(howmany / delta_d));
+
+	results.push_back( howmany / delta_d );
 }
 
 static void benchmark_conversion_pattern( std::string name,
@@ -48,6 +51,8 @@ static void benchmark_conversion_pattern( std::string name,
 				  conversion_pattern,
 				  delta_d,
 				  int(howmany / delta_d) );
+
+	results.push_back( howmany / delta_d );
 }
 
 static void bench_log4cxx_single_threaded(int iters)
@@ -127,6 +132,11 @@ int main(int argc, char *argv[])
 	LOG4CXX_INFO_FMT(console, "Benchmarking library only(no writing out):");
 	bench_log4cxx_single_threaded(iters);
 	bench_log4cxx_multi_threaded(threads, iters);
+
+	LOG4CXX_INFO_FMT(console, "Results for use in spreadsheet:");
+	for( uint64_t result : results ){
+		LOG4CXX_INFO_FMT(console, "{}", result );
+	}
 
     return EXIT_SUCCESS;
 }
