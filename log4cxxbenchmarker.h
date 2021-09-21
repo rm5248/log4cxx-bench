@@ -31,6 +31,17 @@ public:
 	static void logWithFMT( int howmany );
 
 	/**
+	 * Reset logger for multithreaded setup.
+	 */
+	static void log_MT_setup();
+
+	/**
+	 * Log with the LOG4CXX_INFO_FMT macro to see how long it takes(multithreaded).
+	 * @param howmany
+	 */
+	static void logWithFMT_MT( int howmany );
+
+	/**
 	 * Log a string that doesn't use operator<< any place.
 	 *
 	 * String to log: "This is a static string to see what happens"

@@ -93,6 +93,30 @@ void log4cxxbenchmarker::logWithFMT(int howmany){
 	}
 }
 
+void log4cxxbenchmarker::log_MT_setup(){
+	log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger( "bench_logger" );
+
+	logger->removeAllAppenders();
+	logger->setAdditivity( false );
+	logger->setLevel( log4cxx::Level::getInfo() );
+
+	log4cxx::PatternLayoutPtr pattern( new log4cxx::PatternLayout() );
+	pattern->setConversionPattern( "%m%n" );
+
+	log4cxx::NullWriterAppenderPtr nullWriter( new log4cxx::NullWriterAppender );
+	nullWriter->setLayout( pattern );
+
+	logger->addAppender( nullWriter );
+}
+
+void log4cxxbenchmarker::logWithFMT_MT(int howmany){
+	log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger( "bench_logger" );
+
+	for( int x = 0; x < howmany; x++ ){
+		LOG4CXX_INFO_FMT( logger, "Hello logger: msg number {}", x);
+	}
+}
+
 void log4cxxbenchmarker::logString( int howmany ){
 	log4cxx::LoggerPtr logger = resetLogger();
 

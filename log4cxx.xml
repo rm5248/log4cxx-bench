@@ -19,6 +19,19 @@
     </layout>
   </appender>
 
+  <appender name="logger2appender" class="org.apache.log4j.FileAppender">
+    <param name="file" value="log/basic_st.log" />
+    <param name="bufferedio" value="true"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%m%n" />
+    </layout>
+  </appender>
+
+  <appender name="Async" class="org.apache.log4j.AsyncAppender">
+    <param name="Blocking" value="true" />
+    <appender-ref ref="logger1appender" />
+  </appender>
+
   <root>
         <priority value="off" />
   </root>
@@ -28,11 +41,20 @@
         <appender-ref ref="logger1appender"/>
   </logger>
 
+  <logger name="logger2" >
+        <priority value ="info" />
+        <appender-ref ref="logger2appender"/>
+  </logger>
+
   <logger name="console" >
         <priority value ="info" />
         <appender-ref ref="ConsoleAppender"/>
   </logger>
 
+  <logger name="logger_async">
+    <level value ="debug" /> <!-- Log values with level higher than ... -->
+    <appender-ref ref="Async"/>
+  </logger>
 
  </log4j:configuration>
 
